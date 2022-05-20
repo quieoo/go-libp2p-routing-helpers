@@ -2,6 +2,9 @@ package routinghelpers
 
 import (
 	"context"
+	"errors"
+	"fmt"
+	"github.com/libp2p/go-libp2p-kad-dht/providers"
 	"io"
 
 	ci "github.com/libp2p/go-libp2p-core/crypto"
@@ -122,6 +125,39 @@ func (r Tiered) Close() error {
 		}
 	}
 	return me.ErrorOrNil()
+}
+
+func (r Tiered) GetProviderManager() *providers.ProviderManager {
+	if len(r.Routers) == 1 {
+		return r.Routers[0].(routing.ProviderManagerRouting).GetProviderManager()
+	}
+	fmt.Println("Error in routing-helpers-tiered")
+	return nil
+}
+
+func (r Tiered) ProvideTo(ctx context.Context, c cid.Cid, p peer.ID) error {
+	if len(r.Routers) == 1 {
+		return r.Routers[0].(routing.ProviderManagerRouting).ProvideTo(ctx, c, p)
+	}
+	fmt.Println("Error in routing-helpers-tiered")
+
+	return nil
+}
+
+func (r Tiered) FindProviderFrom(ctx context.Context, c cid.Cid, p peer.ID) ([]peer.ID, error) {
+	if len(r.Routers) == 1 {
+		return r.Routers[0].(routing.ProviderManagerRouting).FindProviderFrom(ctx, c, p)
+	}
+	//fmt.Println("Error in routing-helpers-tiered")
+	return nil, errors.New("Error in routing-helpers-tiered")
+}
+
+func (r Tiered) SelfID() peer.ID {
+	if len(r.Routers) == 1 {
+		return r.Routers[0].(routing.ProviderManagerRouting).SelfID()
+	}
+	fmt.Println("Error in routing-helpers-tiered SelfID")
+	return peer.ID("")
 }
 
 var _ routing.Routing = Tiered{}
